@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "acc"
 version = "0.1.0"
-description = "Adaptive Cruise Control"
-authors = ["Tomas Sanchez <info@tomsanchez.com.ar>", "Araceli Soffulto <asoffulto@frba.utn.edu.ar>"]
+description = "Cruise Control"
+authors = ["Tomas Sanchez <info@tomsanchez.com.ar>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "acc" }]
+packages = [{ include = "acc", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
