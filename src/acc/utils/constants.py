@@ -13,5 +13,8 @@ SPEEDOMETER_STD = 0.2778  # m/s
 SPEEDOMETER_MAX_READING = 80.0  # m/s
 SPEEDOMETER_MIN_READING = 0.0  # m/s
 
+# Simulation constants
+DEFAULT_SPEED = 30.0  # m/s
+
 # Print Constants
 CONSOLE_BANNER = "[yellow]==============================================[/yellow]"
