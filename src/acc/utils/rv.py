@@ -1,7 +1,8 @@
 """
 Random Variables utilities
 """
-from scipy.stats import maxwell, truncnorm
+import numpy as np
+from scipy.stats import maxwell, truncnorm, semicircular
 
 
 def produce_intervals(size: int = 3_600) -> list[int]:
@@ -54,3 +55,39 @@ def produce_inclinations(mean_inclination_flat: float = 0.0,
             inclinations.extend(segment_inclinations)
 
     return inclinations[:size]
+
+
+class RoadInclinationGenerator:
+
+    def __init__(self,
+                 max_inclination: float = 7.0,
+                 time_limit: int = 3_600,
+                 time_recovery_rate: int = 2,
+                 angle_recovery_rate: float = 0.5):
+        self.last_inclination = 0.0
+        self.last_time = 0
+        self._intervals = produce_intervals(int(time_limit * 0.05))
+        self._angle_rate = angle_recovery_rate
+        self._time_rate = time_recovery_rate
+        self._theta_max = max_inclination
+
+    def next_inclination(self, time: int) -> float:
+
+        if time in self._intervals:
+            # Random change in the inclination angle
+            theta = semicircular.rvs()
+            # Update the inclination angle limiting its value
+            self.last_inclination = np.clip(theta, -self._theta_max, self._theta_max)
+            self.last_time = time
+
+        # road level recovery
+        if self.last_time + self._time_rate > time:
+            return self._level_angle(self.last_inclination)
+
+        return self.last_inclination
+
+    def _level_angle(self, theta: float) -> float:
+        if theta >= 0:
+            return max(theta - self._angle_rate, 0)
+        else:
+            return min(theta + self._angle_rate, 0)

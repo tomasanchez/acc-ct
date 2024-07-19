@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from acc.model.control import EngineControlUnit
 from acc.model.feedback import speedometer
 from acc.model.process import Vehicle, process, tcu
-from acc.utils.rv import produce_inclinations
+from acc.utils.rv import RoadInclinationGenerator
 
 
 class SimulationResult(BaseModel):
@@ -48,7 +48,7 @@ def run_simulation(vehicle: Vehicle,
                    initial_speed: float = 0.0,
                    total_time: float = 3_600.0,
                    dt: float = 1.0,
-                   road_inclinations: list[float] | None = None,
+                   inclination_generator: RoadInclinationGenerator | None = None,
                    ) -> SimulationResult:
     """
     Run the simulation of the CC system
@@ -60,17 +60,14 @@ def run_simulation(vehicle: Vehicle,
         initial_speed: initial speed of the vehicle
         total_time: total simulation time
         dt: time step
-        road_inclinations: road inclinations
-
+        inclination_generator: road inclination generator
+        
     Returns:
         Time series of the simulation
     """
     subject = vehicle.model_copy(update={'speed': initial_speed, 'position': 0})
 
-    if road_inclinations is None:
-        road_inclinations = produce_inclinations(size=int(total_time))
-
-    result = SimulationResult(inclinations=road_inclinations)
+    result = SimulationResult()
 
     for t in range(int(total_time)):
         # [Vo] - Output: plant velocity
@@ -88,11 +85,7 @@ def run_simulation(vehicle: Vehicle,
         # gear shifting
         subject.gear = tcu(subject, f)
 
-        try:
-            theta = road_inclinations[t]
-        except IndexError:
-            road_inclinations.append(0)
-            theta = 0
+        theta = inclination_generator.next_inclination(t) if inclination_generator else 0
 
         # vo(t) - Process: Vehicle Dynamics
         vo = process(subject, throttle=u, dt=dt, theta=theta)
@@ -104,7 +97,6 @@ def run_simulation(vehicle: Vehicle,
         result.gears.append(subject.gear)
         result.throttle.append(u)
         result.speedometer.append(f * 3.6)
-
-    result.inclinations = road_inclinations
+        result.inclinations.append(theta)
 
     return result
