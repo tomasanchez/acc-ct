@@ -72,6 +72,10 @@ def plot_results(results: SimulationResult,
         print(f"Saving the plot to {output_folder}")
         plt.savefig(output_folder)
 
+        csv_output = Path(output_directory, 'results.csv')
+        print(f"Saving the simulation results to {csv_output}")
+        results.df().to_csv(csv_output)
+
 
 def to_rich_table(
         pandas_dataframe: pd.DataFrame,
