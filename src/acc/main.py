@@ -7,6 +7,7 @@ from rich.progress import track
 from acc.model.control import EngineControlUnit
 from acc.model.process import Vehicle
 from acc.simulation import run_simulation, SimulationResult
+from acc.utils.constants import CONSOLE_BANNER
 from acc.utils.plot import plot_results
 from acc.utils.rv import RoadInclinationGenerator
 
@@ -18,11 +19,11 @@ def main_simulation(kp: float = 0.5,
                     vi: float = 30.0,
                     road_inclinations: bool = False
                     ) -> SimulationResult:
-    print("Running simulation with the following parameters:")
+    print("\n[cyan]Running simulation with the following parameters[/cyan]:")
     print(f"  - Kp: {kp}")
     print(f"  - Ki: {ki}")
     print(f"  - Kd: {kd}")
-    print(f"  - Step Speed: {vi}")
+    print(f"  - Step Speed: {round(vi, 2)} m/s ({vi * 3.6} km/h)")
     print(f"  - Windup Protection: {windup_protection}")
     print(f"  - Road Inclinations: {road_inclinations}")
 
@@ -46,19 +47,22 @@ def main_simulation(kp: float = 0.5,
 
 
 def main():
-    print("==============================================")
+    print(CONSOLE_BANNER)
     print("Cruise Control System Simulation")
     print("By Tomas A. Sanchez")
-    print("==============================================")
+    print(CONSOLE_BANNER)
 
     print("\nThis simulation models the behavior of a vehicle equipped with a cruise control system.")
-    print("Simulation is using TOYOTA CAMRY XSE dynamics.\n")
+    print("Simulation is using [bold yellow]TOYOTA CAMRY XSE 2025[/bold yellow] specs.\n")
+    vi: float = typer.prompt("Set step speed (km/h)", default=108)
 
-    vi: float = typer.prompt("Enter the step speed (km/h)", default=108)
+    print("\n[blue]PID Controller Parameters[/blue]:")
     kp: float = typer.prompt("Enter the proportional gain", default=0.5)
     ki: float = typer.prompt("Enter the integral gain", default=0.25)
     kd: float = typer.prompt("Enter the derivative gain", default=1.0)
-    use_windup: bool = typer.confirm("Use Windup Protection?", default=False)
+    use_windup: bool = typer.confirm("Use Integral Windup?", default=False)
+
+    print("\n[blue]Disturbance Options[/blue]:")
     generate_road_inclinations: bool = typer.confirm("Generate Road Inclinations?", default=False)
 
     result = main_simulation(vi=vi / 3.6,
@@ -68,12 +72,13 @@ def main():
     for value in track(range(100), description="Simulating..."):
         time.sleep(0.5 if value >= 90 else 0.01)
 
-    print("\n[magenta]Simulation Results[/magenta]:\n")
+    print("\n[magenta]Variables over time[/magenta]:")
     print(result.df().describe())
+    print(CONSOLE_BANNER)
     plot_results(result, step_speed=vi, save=True)
-    print("Simulation Results plotted!")
-    print("==============================================")
-    print("[bold green]Simulation Completed![/bold green]\n")
+    print("Simulation Results plotted: check the 'output' folder for the plots.")
+    print("[bold green]Simulation finished successfully[/bold green]")
+    print(CONSOLE_BANNER)
 
 
 if __name__ == "__main__":
