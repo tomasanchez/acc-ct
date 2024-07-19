@@ -29,5 +29,11 @@ python src/acc/main.py
 
 You will be prompted to enter multiple values for the simulation. You can use the default values by pressing `Enter`.
 
+Or you can run the simulation with the default values by executing the following command:
+
+```bash
+python src/acc/main.py --default
+```
+
 After the simulation is complete, a [`output/results.png`](./output/results.png) will be saved containing error, speed,
 and throttle plots over time. Results are also provided as a `CSV` file in [`output/results.csv`](./output/results.csv).
