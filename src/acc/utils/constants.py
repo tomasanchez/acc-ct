@@ -8,7 +8,7 @@ p_sua = 0.02  # probability of sudden unintended acceleration
 
 # Speedometer Constants
 
-SPEEDOMETER_BIAS = 0.2778  # m/s
-SPEEDOMETER_STD = 0.5556  # m/s
+SPEEDOMETER_BIAS = 0  # m/s
+SPEEDOMETER_STD = 0.2778  # m/s
 SPEEDOMETER_MAX_READING = 80.0  # m/s
 SPEEDOMETER_MIN_READING = 0.0  # m/s
