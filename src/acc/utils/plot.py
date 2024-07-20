@@ -69,11 +69,11 @@ def plot_results(results: SimulationResult,
 
         output_folder = Path(output_directory, 'results.png')
 
-        print(f"Saving the plot to [blue bold]{output_folder}[/blue bold]")
+        print(f"Plotting in [blue bold]{output_folder}[/blue bold]")
         plt.savefig(output_folder)
 
         csv_output = Path(output_directory, 'results.csv')
-        print(f"Saving the simulation results to [blue bold]{csv_output}[/blue bold]")
+        print(f"Saving series in [blue bold]{csv_output}[/blue bold]")
         results.df().to_csv(csv_output)
 
 

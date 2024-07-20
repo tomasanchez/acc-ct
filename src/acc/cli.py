@@ -54,7 +54,12 @@ def prompt_simulation_parameters() -> tuple[SimulationResult, float]:
     Returns:
         tuple[SimulationResult, float]: the simulation result and the step speed
     """
-    vi: float = typer.prompt("Set step speed (km/h)", default=108) / 3.6
+
+    vi: float = typer.prompt("Set step speed (km/h)", default=108)
+    while not (30 <= vi <= 130.0):
+        print("[bold red]Error[/bold red]: Step Speed must be between 30 and 130 km/h")
+        vi: float = typer.prompt("Set step speed (km/h)", default=108)
+    vi = vi / 3.6  # Convert to m/s
     print("\n[blue]PID Controller Parameters[/blue]:")
     kp: float = typer.prompt("Enter the proportional gain (Kp)", default=0.5)
     ki: float = typer.prompt("Enter the integral gain (Ki)", default=0.25)
@@ -100,6 +105,6 @@ def cli(
     print(result.df().describe())
     print(CONSOLE_BANNER)
     plot_results(result, step_speed=vi * 3.6, save=True)
-    print("Simulation Results plotted: check the 'output' folder for the plots.")
+    print("Results saved. Check the 'output/' directory.")
     print("[bold green]Simulation finished successfully[/bold green]")
     print(CONSOLE_BANNER)
