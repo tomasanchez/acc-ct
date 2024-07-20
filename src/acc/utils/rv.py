@@ -81,13 +81,15 @@ class RoadInclinationGenerator:
             self.last_time = time
 
         # road level recovery
-        if self.last_time + self._time_rate > time:
+        if time - self.last_time > self._time_rate:
             return self._level_angle(self.last_inclination)
 
         return self.last_inclination
 
     def _level_angle(self, theta: float) -> float:
-        if theta >= 0:
-            return max(theta - self._angle_rate, 0)
+        if abs(theta) <= self._angle_rate:
+            return 0
+        elif theta > 0:
+            return np.clip(theta - self._angle_rate, 0, theta)
         else:
-            return min(theta + self._angle_rate, 0)
+            return np.clip(theta + self._angle_rate, theta, 0)
