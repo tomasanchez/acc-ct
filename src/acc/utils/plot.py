@@ -37,6 +37,9 @@ def plot_results(results: SimulationResult,
 
     # Plot the error
     plt.subplot(plots, 1, 2)
+    # get mean error
+    mean_error = sum(results.errors) / len(results.errors)
+    plt.axhline(y=mean_error, color='black', linestyle='dotted', label='Mean Error')
     plt.plot(results.times, results.errors, label='Error')
     plt.xlabel('Time (s)')
     plt.ylabel('Error (km/h)')
@@ -46,6 +49,7 @@ def plot_results(results: SimulationResult,
     # Plot the road inclination
     if results.inclinations:
         plt.subplot(plots, 1, plots - 1)
+        plt.axhline(y=0, color='black', linestyle='dotted', label='Flat Road')
         plt.plot(results.times, results.inclinations, label='Inclination')
         plt.xlabel(time_label)
         plt.ylabel('Inclination (degrees)')
