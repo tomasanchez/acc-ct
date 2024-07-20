@@ -18,7 +18,8 @@ def cli_simulate(kp: float = 0.5,
                  kd: float = 1.0,
                  windup_protection: bool = False,
                  vi: float = 30.0,
-                 road_inclinations: bool = False
+                 road_inclinations: bool = False,
+                 simulation_time: float = 3_600.0
                  ) -> SimulationResult:
     print("\n[cyan]Running simulation with the following parameters[/cyan]:")
     print(f"  - Kp: {kp}")
@@ -44,7 +45,9 @@ def cli_simulate(kp: float = 0.5,
                           vi=vi,
                           control=ecu,
                           inclination_generator=RoadInclinationGenerator() if road_inclinations else None,
-                          initial_speed=0)
+                          initial_speed=0,
+                          total_time=simulation_time
+                          )
 
 
 def prompt_simulation_parameters() -> tuple[SimulationResult, float]:
@@ -54,6 +57,12 @@ def prompt_simulation_parameters() -> tuple[SimulationResult, float]:
     Returns:
         tuple[SimulationResult, float]: the simulation result and the step speed
     """
+
+    tf = typer.prompt("How long should the simulation last? (s)", default=3_600)
+
+    while tf <= 0:
+        print("[bold red]Error[/bold red]: Simulation time must be greater than 0")
+        tf = typer.prompt("Set simulation time (s)", default=3_600)
 
     vi: float = typer.prompt("Set step speed (km/h)", default=108)
     while not (30 <= vi <= 130.0):
@@ -71,7 +80,9 @@ def prompt_simulation_parameters() -> tuple[SimulationResult, float]:
 
     return cli_simulate(vi=vi,
                         kp=kp, ki=ki, kd=kd, windup_protection=use_windup,
-                        road_inclinations=generate_road_inclinations), vi
+                        road_inclinations=generate_road_inclinations,
+                        simulation_time=tf,
+                        ), vi
 
 
 def cli(
