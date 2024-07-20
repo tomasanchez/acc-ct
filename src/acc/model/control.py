@@ -8,6 +8,8 @@ import dataclasses
 
 import numpy as np
 
+from acc.utils.constants import PID_GAIN
+
 
 @dataclasses.dataclass
 class EngineControlUnit:
@@ -42,7 +44,9 @@ class EngineControlUnit:
 
         # u(t) = Kp * e(t) + Ki * ∫e(t)dt + Kd * de(t)/dt
         output = self.kp * error + self.ki * self._integral + self.kd * derivative
-        output = np.clip(output, -1, 1)
+
+        # Clip the output to [-1, 1] to adjust to a percentage of throttle
+        output = np.clip(output * PID_GAIN, -1, 1)
 
         if self.windup_protection:
             if not (output == -1 and error < 0) and not (output == 1 and error > 0):
